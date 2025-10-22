@@ -1,0 +1,44 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Môi trường ảo (Virtual environments)
+.env
+venv/
+env/
+
+# IDE và tệp cấu hình hệ điều hành
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# Bỏ qua Jupyter Notebooks và checkpoints
+*.ipynb
+.ipynb_checkpoints
+
+# Bỏ qua tất cả dữ liệu (thô và đã xử lý)\
+data/
+data/raw_pgn/
+data/processed/
+
+# Bỏ qua tất cả các mô hình đã huấn luyện (checkpoints)
+models/sl_base_model/
+models/rl_best_model/
+models/rl_candidate_model/
+*.h5
+*.hdf5
+*.pb
+*.pt
+*.pth
+*.onnx
+
+# Tệp log và kết quả
+*.log
+results/
+
+# Bỏ qua các engine ngoài
+other/
+working_process/
+pgn/
