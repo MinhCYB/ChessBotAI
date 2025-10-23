@@ -28,35 +28,36 @@ class ChessSLDataset(Dataset):
     Dataset "siêu lười": quét thư mục để lấy "mục lục"
     và chỉ mở file khi __getitem__ được gọi.
     """
-    def __init__(self, processed_dir):
+    def __init__(self, processed_dir, sources=[""]):
         self.processed_dir = processed_dir
         self.file_base_paths = []
         self.cumulative_sizes = [0] # Mục lục
         
         print(f"Đang lập chỉ mục (indexing) thư mục: {processed_dir}")
         
-        file_names = sorted(
-            [f for f in os.listdir(processed_dir) if f.endswith(".X.npy")]
-        )
-        
-        for file_name in file_names:
-            base_name = file_name.replace(".X.npy", "")
-            base_path = os.path.join(self.processed_dir, base_name)
+        for source in sources:
+            path = os.path.join(processed_dir, source)
+            file_names = sorted(
+                [f for f in os.listdir(path) if f.endswith(".X.npy")]
+            )
             
-            # Mở file .X.npy TẠM THỜI chỉ để lấy độ dài
-            try:
-                # Dùng mmap_mode='r' để đọc header nhanh
-                X_mmap = np.load(f"{base_path}.X.npy", mmap_mode='r')
-                file_length = len(X_mmap)
-                del X_mmap # Đóng file mmap tạm thời
+            for file_name in file_names:
+                base_name = file_name.replace(".X.npy", "")
+                base_path = os.path.join(path, base_name)
                 
-                if file_length > 0:
-                    self.file_base_paths.append(base_path)
-                    # Thêm vào mục lục
-                    self.cumulative_sizes.append(self.cumulative_sizes[-1] + file_length)
-                    print(f"  -> Lập chỉ mục '{base_name}' với {file_length} mẫu.")
-            except Exception as e:
-                print(f"  -> Lỗi khi lập chỉ mục {base_name}: {e}. Bỏ qua.")
+                try:
+                    # Dùng mmap_mode='r' để đọc header nhanh
+                    X_mmap = np.load(f"{base_path}.X.npy", mmap_mode='r')
+                    file_length = len(X_mmap)
+                    del X_mmap # Đóng file mmap tạm thời
+                    
+                    if file_length > 0:
+                        self.file_base_paths.append(base_path)
+                        # Thêm vào mục lục
+                        self.cumulative_sizes.append(self.cumulative_sizes[-1] + file_length)
+                        print(f"  -> Lập chỉ mục '{base_name}' với {file_length} mẫu.")
+                except Exception as e:
+                    print(f"  -> Lỗi khi lập chỉ mục {base_name}: {e}. Bỏ qua.")
 
         self.total_length = self.cumulative_sizes[-1]
         print(f"Tổng cộng lập chỉ mục {self.total_length} mẫu từ {len(self.file_base_paths)} bộ file.")

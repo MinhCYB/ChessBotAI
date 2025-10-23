@@ -21,9 +21,8 @@ def train_supervised_model():
 
     # 2. Tải và chuẩn bị dữ liệu 
 
-    dataset_dir = os.path.join(config.PROCESSED_DIR, "twic")
-    print(f"Quét dữ liệu .npy từ thư mục: {dataset_dir}")
-    full_dataset = ChessSLDataset(dataset_dir)
+    print(f"Quét dữ liệu .npy từ thư mục: {config.PROCESSED_DIR}")
+    full_dataset = ChessSLDataset(config.PROCESSED_DIR, config.SOURCES)
     
     print(f"\n---> TỔNG CỘNG: {len(full_dataset)} mẫu dữ liệu bộ file.")
     
@@ -54,10 +53,10 @@ def train_supervised_model():
         num_planes=config.TOTAL_PLANES
     ).to(device)
 
-    model_path = os.path.join(config.CANDIDATE_DIR, f"sl_model.pth")
-    if os.path.exists(model_path):
-        print(f"Load model in {model_path}")
-        model.load_state_dict(torch.load(model_path))
+    # model_path = os.path.join(config.CANDIDATE_DIR, f"sl_model.pth")
+    # if os.path.exists(model_path):
+    #     print(f"Load model in {model_path}")
+    #     model.load_state_dict(torch.load(model_path))
         # model.eval()
 
     # 4. Định nghĩa Loss và Optimizer 

@@ -8,8 +8,11 @@ class ChessCNN(nn.Module):
         """
             Các dữ liệu: 
             - Thế trận của history_length
-            - 4 Quyền nhập thành
-            - Quyền đi hiện tại
+            - Quyền nhập thành (4 loại)
+            - Lượt đi
+            - halfmove clock (chuẩn hóa / 50)
+            - fullmove number (chuẩn hóa / 100)
+            - repetition (1 nếu vị trí lặp, 0 nếu không)
         """
         
         self.num_planes = num_planes
