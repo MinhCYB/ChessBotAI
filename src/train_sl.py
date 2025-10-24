@@ -57,7 +57,7 @@ if __name__ == "__main__":
     if os.path.exists(model_path):
         print(f"Load model in {model_path}")
         model.load_state_dict(torch.load(model_path))
-        model.eval()
+        # model.eval()
 
     # 4. Định nghĩa Loss và Optimizer 
     policy_criterion = nn.NLLLoss().to(device) 

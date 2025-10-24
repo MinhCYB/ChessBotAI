@@ -81,7 +81,7 @@ def extract_from_pgn(file_path, save_dir, csv_path, file_name, min_elo = 0, min_
 
                 pbar.update(1)
 
-                if len(list_valid_game) >= 2000: 
+                if len(list_valid_game) >= 5000: 
                     save(list_valid_game, save_dir, csv_path, file_name, sub, trash)
                     list_valid_game = []
                     gc.collect()

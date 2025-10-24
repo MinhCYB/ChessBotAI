@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
 RAW_PGN_DIR = DATA_DIR / "raw_pgn"
 PROCESSED_DIR = DATA_DIR / "processed"
+MERGE_PROCESSED_DIR = DATA_DIR / "merge_processed"
 SPLIT_DIR = DATA_DIR / "split"
 MODEL_DIR = BASE_DIR / "models"
 SL_MODEL_DIR = MODEL_DIR / "sl_base_model"
@@ -30,11 +31,12 @@ PGN_PATH = BASE_DIR / "pgn/battle.pgn"
 # SOURCES = ["twic", "master", "tcec", "lichess", "ccrl"]
 # SOURCES = ["tcec", "lichess", "ccrl", "master", "twic"]
 SOURCES = ["lichess_2024", "lichess_2025"]  
+# SOURCES = ["lichess_2025"]
 
 # --- define log ---
 logging.basicConfig(
     filename=LOG_PATH,
-    level=logging.INFO,
+    level=logging.INFO, 
     format="%(asctime)s - %(levelname)s - [%(funcName)s][%(filename)s:%(lineno)d]: %(message)s",
     datefmt="%H:%M:%S"
 )
