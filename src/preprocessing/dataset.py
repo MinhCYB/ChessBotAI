@@ -1,5 +1,3 @@
-# src/preprocessing/dataset.py
-
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -47,9 +45,14 @@ class ChessSLDataset(Dataset):
                 
                 try:
                     # Dùng mmap_mode='r' để đọc header nhanh
-                    X_mmap = np.load(f"{base_path}.X.npy", mmap_mode='r')
+                    # X_mmap = np.load(f"{base_path}.X.npy", mmap_mode='r')
+                    X_mmap = get_mmap_array(f"{base_path}.X.npy")
+
+                    if X_mmap is None:
+                        raise Exception("Không thể mmap (lỗi từ helper)")
+                    
                     file_length = len(X_mmap)
-                    del X_mmap # Đóng file mmap tạm thời
+                    # del X_mmap # Đóng file mmap tạm thời
                     
                     if file_length > 0:
                         self.file_base_paths.append(base_path)

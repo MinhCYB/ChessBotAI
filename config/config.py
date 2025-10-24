@@ -10,10 +10,10 @@ POLICY_OUTPUT_SIZE = 20480
 
 # Siêu tham số huấn luyện SL
 LEARNING_RATE = 0.001
-BATCH_SIZE = 256
+BATCH_SIZE = 1024
 EPOCHS = 20
 VAL_SPLIT = 0.2 
-NUM_WORKERS = 0
+NUM_WORKERS = 4
 
 # Path
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -29,7 +29,7 @@ LOG_PATH = BASE_DIR / "log/debug.log"
 PGN_PATH = BASE_DIR / "pgn/battle.pgn"
 # SOURCES = ["twic", "master", "tcec", "lichess", "ccrl"]
 # SOURCES = ["tcec", "lichess", "ccrl", "master", "twic"]
-SOURCES = ["lichess_2023"]  
+SOURCES = ["lichess_2024", "lichess_2025"]  
 
 # --- define log ---
 logging.basicConfig(

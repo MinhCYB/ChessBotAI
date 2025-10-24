@@ -10,7 +10,7 @@ from src.model.architecture import ChessCNN
 from src.preprocessing.dataset import ChessSLDataset
 import config.config as config
 
-def train_supervised_model():
+if __name__ == "__main__":
     print("--- Bắt đầu Giai đoạn 1: Huấn luyện có giám sát ---")
 
     # 1. Thiết lập thiết bị 
@@ -53,11 +53,11 @@ def train_supervised_model():
         num_planes=config.TOTAL_PLANES
     ).to(device)
 
-    # model_path = os.path.join(config.CANDIDATE_DIR, f"sl_model.pth")
-    # if os.path.exists(model_path):
-    #     print(f"Load model in {model_path}")
-    #     model.load_state_dict(torch.load(model_path))
-        # model.eval()
+    model_path = os.path.join(config.CANDIDATE_DIR, f"sl_lichess_model.pth")
+    if os.path.exists(model_path):
+        print(f"Load model in {model_path}")
+        model.load_state_dict(torch.load(model_path))
+        model.eval()
 
     # 4. Định nghĩa Loss và Optimizer 
     policy_criterion = nn.NLLLoss().to(device) 
@@ -151,11 +151,8 @@ def train_supervised_model():
         # 6. Lưu lại model tốt nhất
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
-            path_model = os.path.join(config.SL_MODEL_DIR, f'sl_base_model.pth')
+            path_model = os.path.join(config.SL_MODEL_DIR, f'sl_lichess_model.pth')
             torch.save(model.state_dict(), path_model)
             print(f"-> New best model saved to {path_model} (Val Loss: {avg_val_loss:.4f})")
 
     print("--- Huấn luyện Giai đoạn 1 Hoàn tất ---")
-
-if __name__ == "__main__":
-    train_supervised_model()

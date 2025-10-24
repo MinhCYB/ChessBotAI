@@ -12,15 +12,15 @@ logger = logging.getLogger(__name__)
 
 
 class Inference: 
-    def __init__(self, model_name='sl_model'):
+    def __init__(self, model_name='sl_model', history_length=1):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = ChessCNN(num_planes=config.TOTAL_PLANES).to(self.device)
+        self.model = ChessCNN(num_planes=8+history_length*12).to(self.device)
         self.load(model_name)
         self.cnt_win = 0
 
         self.model_name = model_name
-        self.history = deque(maxlen=config.HISTORY_LENGTH)
-        for _ in range(config.HISTORY_LENGTH):
+        self.history = deque(maxlen=history_length)
+        for _ in range(history_length):
             self.history.append(utils.board_to_numpy(chess.Board()))
 
     def get_action(self, board): 

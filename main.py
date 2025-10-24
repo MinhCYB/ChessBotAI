@@ -32,7 +32,7 @@ def battle(bot1: Inference, bot2: Inference):
         move, _ = bot.get_action(board)
         board.push(move)
         node = node.add_variation(move)
-        turn = "white" if board.turn == chess.WHITE else "black"
+        # turn = "white" if board.turn == chess.WHITE else "black"
         # print(f"{bot.model_name} ({turn}) move {move}")
         # print(board)
         # print("===============================\n")
@@ -84,8 +84,8 @@ def battle_other_engine(bot1: Inference, engine):
 
 if __name__ == '__main__': 
     battles = 1000
-    bot1 = Inference('sl_model')
-    bot2 = Inference('sl_base_model')
+    bot1 = Inference('sl_model', 5)
+    bot2 = Inference('sl_lichess_model', 1)
     print(f"{bot1.model_name} vs {bot2.model_name}")
     cnt_draw = 0
     for i in trange(battles, unit="game"):
@@ -94,6 +94,7 @@ if __name__ == '__main__':
             cnt_draw += 1
         else: 
             tqdm.write(info)
+            break
 
     print(f"Done:D")
     print(f"{bot1.model_name}: Tỉ lệ thắng={(bot1.cnt_win/battles)*100:.1f}%")
