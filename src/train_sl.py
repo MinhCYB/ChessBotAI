@@ -22,20 +22,35 @@ if __name__ == "__main__":
     # 2. Tải và chuẩn bị dữ liệu 
 
     print(f"Quét dữ liệu .npy từ thư mục: {config.PROCESSED_DIR}")
-    full_dataset = ChessSLDataset(config.PROCESSED_DIR, config.SOURCES)
+    full_dataset = ChessSLDataset(config.PROCESSED_DIR)
     
     print(f"\n---> TỔNG CỘNG: {len(full_dataset)} mẫu dữ liệu bộ file.")
     
     # Chia Train / Validation 
     val_size = int(len(full_dataset) * config.VAL_SPLIT)
     train_size = len(full_dataset) - val_size
-    train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+    # train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+
+    train_dataset = ChessSLDataset(
+        processed_dir=config.PROCESSED_DIR, 
+        mode='train', 
+        val_split=config.VAL_SPLIT, # Lấy 0.2 từ config
+        shuffle_chunks=True         # Bật xáo trộn file băm
+    )
+
+    # 3. Tạo Val Dataset (Nó sẽ lấy 20% file băm còn lại)
+    val_dataset = ChessSLDataset(
+        processed_dir=config.PROCESSED_DIR, 
+        mode='val', 
+        val_split=config.VAL_SPLIT,
+        shuffle_chunks=False        # Val thì không cần xáo trộn
+    )
     
     print(f"Tạo DataLoaders... (Train: {train_size}, Val: {val_size})")
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.BATCH_SIZE,
-        shuffle=True,
+        shuffle=False,
         num_workers=config.NUM_WORKERS,
         pin_memory=True 
     )
@@ -53,10 +68,10 @@ if __name__ == "__main__":
         num_planes=config.TOTAL_PLANES
     ).to(device)
 
-    model_path = os.path.join(config.CANDIDATE_DIR, f"sl_lichess_model.pth")
-    if os.path.exists(model_path):
-        print(f"Load model in {model_path}")
-        model.load_state_dict(torch.load(model_path))
+    # model_path = os.path.join(config.CANDIDATE_DIR, f"sl_lichess_model.pth")
+    # if os.path.exists(model_path):
+    #     print(f"Load model in {model_path}")
+    #     model.load_state_dict(torch.load(model_path))
         # model.eval()
 
     # 4. Định nghĩa Loss và Optimizer 

@@ -8,12 +8,28 @@ METADATA_LENGTH = 8 # thông tin thêm (4 quyền nhập thành) + (halfmove) + 
 TOTAL_PLANES = HISTORY_LENGTH * 12 + METADATA_LENGTH 
 POLICY_OUTPUT_SIZE = 20480
 
-# Siêu tham số huấn luyện SL
+# Siêu tham số huấn luyện 
 LEARNING_RATE = 0.001
 BATCH_SIZE = 1024
 EPOCHS = 20
-VAL_SPLIT = 0.2 
+VAL_SPLIT = 0.8 
 NUM_WORKERS = 4
+
+RL_TOTAL_ITERATIONS = 10
+RL_NUM_WORKERS = 5
+RL_NUM_GAMES_PER_ITER = 20
+RL_BUFFER_SIZE_SAMPLES = 800_000
+RL_TRAIN_BATCH_SIZE = 256
+RL_MCTS_SIMULATIONS = 80
+RL_INITIAL_TEMP = 1.0
+RL_TEMP_DECAY_MOVES = 30
+RL_MCTS_CPUCT = 4.0
+RL_TRAIN_EPOCHS = 1 
+RL_TRAIN_LR = 0.0001
+
+RL_EVAL_GAMES = 20 # số game để model cũ đánh với model mới
+RL_EVAL_WIN_THRESHOLD = 0.55
+
 
 # Path
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -25,6 +41,7 @@ SPLIT_DIR = DATA_DIR / "split"
 MODEL_DIR = BASE_DIR / "models"
 SL_MODEL_DIR = MODEL_DIR / "sl_base_model"
 RL_MODEL_DIR = MODEL_DIR / "rl_best_model"
+RL_BEST_MODEL_PATH = RL_MODEL_DIR / "best_model.pth"
 CANDIDATE_DIR = MODEL_DIR / "rl_candidate_model"
 LOG_PATH = BASE_DIR / "log/debug.log"
 PGN_PATH = BASE_DIR / "pgn/battle.pgn"

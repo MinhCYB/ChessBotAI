@@ -3,100 +3,104 @@ import numpy as np
 from torch.utils.data import Dataset
 import os
 import functools
-import bisect # Thư viện để tìm kiếm nhị phân (siêu nhanh)
+import bisect 
+import logging
+import random # <<< THÊM THƯ VIỆN NÀY
 
-# --- Bộ đệm (Cache) cho file mmap ---
-# Cache này sẽ lưu các file mmap đã mở để không phải mở lại
-# maxsize=None nghĩa là cache không giới hạn (giữ tất cả file handles)
-# Đây là chìa khóa để giải quyết WinError 8 mà vẫn nhanh
-@functools.lru_cache(maxsize=None)
+# (Hàm get_mmap_array giữ nguyên, không đổi)
+@functools.lru_cache(maxsize=16) 
 def get_mmap_array(file_path):
-    """
-    Hàm helper: Mở file .npy ở chế độ mmap và cache lại.
-    Hàm này chỉ thực sự chạy 1 LẦN cho mỗi file_path.
-    """
     try:
         return np.load(file_path, mmap_mode='r')
     except Exception as e:
-        print(f"LỖI nghiêm trọng khi mmap file {file_path}: {e}")
+        logging.error(f"LỖI nghiêm trọng khi mmap file băm {file_path}: {e}")
         return None
 
 class ChessSLDataset(Dataset):
     """
-    Dataset "siêu lười": quét thư mục để lấy "mục lục"
-    và chỉ mở file khi __getitem__ được gọi.
+    Dataset "phá đảo I/O"
+    Tự chia train/val và tự shuffle các file băm (chunk).
     """
-    def __init__(self, processed_dir, sources=[""]):
+    
+    # Thêm 3 tham số mới: mode, val_split, shuffle_chunks
+    def __init__(self, processed_dir, mode='train', val_split=0.2, shuffle_chunks=True):
         self.processed_dir = processed_dir
-        self.file_base_paths = []
-        self.cumulative_sizes = [0] # Mục lục
+        self.shards_info = []
+        self.cumulative_sizes = [0]
         
-        print(f"Đang lập chỉ mục (indexing) thư mục: {processed_dir}")
+        print(f"\nĐang lập chỉ mục cho mode: '{mode}'...")
         
-        for source in sources:
-            path = os.path.join(processed_dir, source)
-            file_names = sorted(
-                [f for f in os.listdir(path) if f.endswith(".X.npy")]
+        # 1. Tìm tất cả các file băm
+        try:
+            base_names = sorted(
+                [f.replace(".X.npy", "") for f in os.listdir(processed_dir) if f.endswith(".X.npy")]
             )
-            
-            for file_name in file_names:
-                base_name = file_name.replace(".X.npy", "")
-                base_path = os.path.join(path, base_name)
-                
-                try:
-                    # Dùng mmap_mode='r' để đọc header nhanh
-                    # X_mmap = np.load(f"{base_path}.X.npy", mmap_mode='r')
-                    X_mmap = get_mmap_array(f"{base_path}.X.npy")
+        except FileNotFoundError:
+            print(f"!!! LỖI: Không tìm thấy thư mục 'data': {processed_dir}")
+            raise
+        if not base_names:
+            print(f"!!! LỖI: Không tìm thấy file 'chunk_...X.npy' nào.")
+            raise
 
-                    if X_mmap is None:
-                        raise Exception("Không thể mmap (lỗi từ helper)")
-                    
-                    file_length = len(X_mmap)
-                    # del X_mmap # Đóng file mmap tạm thời
-                    
-                    if file_length > 0:
-                        self.file_base_paths.append(base_path)
-                        # Thêm vào mục lục
-                        self.cumulative_sizes.append(self.cumulative_sizes[-1] + file_length)
-                        print(f"  -> Lập chỉ mục '{base_name}' với {file_length} mẫu.")
-                except Exception as e:
-                    print(f"  -> Lỗi khi lập chỉ mục {base_name}: {e}. Bỏ qua.")
+        # --- 2. LOGIC MỚI: XÁO TRỘN VÀ CHIA FILE BĂM ---
+        if shuffle_chunks:
+            print(f"  -> Đang xáo trộn (shuffle) {len(base_names)} file băm...")
+            random.shuffle(base_names)
+        
+        # Chia danh sách file băm, KHÔNG chia data bên trong
+        split_idx = int(len(base_names) * (1.0 - val_split))
+        
+        if mode == 'train':
+            self.chunk_base_names = base_names[:split_idx]
+            print(f"  -> Mode 'train': Lấy {len(self.chunk_base_names)}/{len(base_names)} file băm đầu tiên.")
+        else: # mode == 'val'
+            self.chunk_base_names = base_names[split_idx:]
+            print(f"  -> Mode 'val': Lấy {len(self.chunk_base_names)}/{len(base_names)} file băm cuối cùng.")
+        # -----------------------------------------------
+
+        # 3. Quét header (Chỉ quét các file của mode này)
+        print("  -> Đang quét header của các file băm được chọn...")
+        for base_name in self.chunk_base_names: # <<< Chỉ lặp qua các file đã chia
+            path_X = os.path.join(processed_dir, f"{base_name}.X.npy")
+            
+            mmap_temp = None
+            try:
+                mmap_temp = np.load(path_X, mmap_mode='r')
+                length = len(mmap_temp)
+                
+                if length > 0:
+                    self.shards_info.append({'base_name': base_name, 'length': length})
+                    self.cumulative_sizes.append(self.cumulative_sizes[-1] + length)
+                
+            except Exception as e:
+                print(f"Lỗi khi đọc header {path_X}: {e}. Bỏ qua.")
+            finally:
+                if mmap_temp is not None:
+                    if hasattr(mmap_temp, 'close'): mmap_temp.close()
+                    del mmap_temp
 
         self.total_length = self.cumulative_sizes[-1]
-        print(f"Tổng cộng lập chỉ mục {self.total_length} mẫu từ {len(self.file_base_paths)} bộ file.")
+        print(f"  -> Tổng cộng {self.total_length} mẫu cho mode '{mode}'.")
 
     def __len__(self):
         return self.total_length
 
+    # __getitem__ giữ nguyên, không cần sửa
     def __getitem__(self, idx):
         if idx < 0 or idx >= self.total_length:
             raise IndexError("Index out of range")
-
-        # 1. Dùng "mục lục" (bisect) để tìm xem idx thuộc file nào
-        # (Siêu nhanh, O(logN))
-        file_index = bisect.bisect_right(self.cumulative_sizes, idx) - 1
-        
-        # 2. Tìm index cục bộ (local_idx) bên trong file đó
-        local_idx = idx - self.cumulative_sizes[file_index]
-        
-        # 3. Lấy base_path của file
-        base_path = self.file_base_paths[file_index]
-        
-        # 4. Lấy data từ các file mmap (dùng cache)
-        # Các hàm này sẽ chỉ thực sự mở file 1 LẦN
+        shard_index = bisect.bisect_right(self.cumulative_sizes, idx) - 1
+        local_idx = idx - self.cumulative_sizes[shard_index]
+        base_name = self.shards_info[shard_index]['base_name']
+        base_path = os.path.join(self.processed_dir, base_name)
         X_mmap = get_mmap_array(f"{base_path}.X.npy")
         P_mmap = get_mmap_array(f"{base_path}.y_policy.npy")
         V_mmap = get_mmap_array(f"{base_path}.y_value.npy")
-        
         if X_mmap is None or P_mmap is None or V_mmap is None:
             raise IOError(f"Không thể đọc data từ {base_path}")
-
-        # 5. Lấy đúng 1 mẫu
         X_item = X_mmap[local_idx]
         P_item = P_mmap[local_idx]
         V_item = V_mmap[local_idx]
-        
-        # 6. Ép kiểu "lười" (giống hệt code cũ)
         return (
             torch.from_numpy(X_item.astype(np.float32)),
             torch.tensor(P_item, dtype=torch.long),
