@@ -19,20 +19,26 @@ env/
 .ipynb_checkpoints
 
 # Bỏ qua tất cả dữ liệu (thô và đã xử lý)\
-data/
-data/raw_pgn/
-data/processed/
+data/crawler/
+data/split/
+data/raw_pgn/*
+data/processed/*
+!data/processed/.gitkeep
+!data/raw_pgn/.gitkeep
 
 # Bỏ qua tất cả các mô hình đã huấn luyện (checkpoints)
-models/sl_base_model/
-models/rl_best_model/
-models/rl_candidate_model/
+models/sl_base_model/*
+models/rl_best_model/*
+models/rl_candidate_model/*
 *.h5
 *.hdf5
 *.pb
 *.pt
 *.pth
 *.onnx
+!models/sl_base_model/.gitkeep
+!models/rl_best_model/.gitkeep
+!models/rl_candidate_model/.gitkeep
 
 # Tệp log và kết quả
 *.log
