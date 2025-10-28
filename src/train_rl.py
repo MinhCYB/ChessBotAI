@@ -5,6 +5,8 @@ import multiprocessing as mp
 from functools import partial
 import os
 import chess
+import argparse
+import sys
 from collections import deque
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -73,6 +75,11 @@ def evaluate_models(best_model: nn.Module,
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str, default="sl_model")
+    args = parser.parse_args()
+    model_input = args.input
+
     print("--- Bắt đầu Giai đoạn 2: Học tăng cường (RL) ---")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Sử dụng thiết bị: {device}")
@@ -85,14 +92,12 @@ if __name__ == "__main__":
     
     # Tải model có sẵn nếu có
     try:
-        model_path = os.path.join(config.CANDIDATE_DIR, "sl_lichess_model_v2.pth")
+        model_path = os.path.join(config.CANDIDATE_DIR, f"{model_input}.pth")
         best_model.load_state_dict(torch.load(model_path))
         print(f"Đã tải model RL tốt nhất từ: {model_path}")
     except FileNotFoundError:
-        print(f"Không tìm thấy model RL. Tải model SL (base) từ: {config.RL_MODEL_DIR}")
-        best_model.load_state_dict(torch.load(config.RL_BEST_MODEL_PATH))
-        os.makedirs(os.path.dirname(config.RL_BEST_MODEL_PATH), exist_ok=True)
-        torch.save(best_model.state_dict(), config.RL_BEST_MODEL_PATH)
+        print(f"Không tìm thấy model từ {model_path}")
+        sys.exit(1)
         
     best_model.eval()
     

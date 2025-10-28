@@ -137,7 +137,6 @@ def main():
     min_ply = args.minply
 
     extract_from_pgn(file_path, save_dir, csv_path, file_name, min_elo, min_ply)
-    # save(states, actions, values, info, save_dir, csv_path, file_name)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chọn chế độ chơi</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<div id="mode-selector" aria-label="Chọn theme bàn cờ">
+  <h1 class="title"> Pick Your Mode Game </h1>
+
+  <div class="mode-list">
+    <div class="mode-card" id="btnHuman">
+      <div class="icon">🤖⚔️👤</div>
+      <div class="label">AI vs You</div>
+    </div>
+
+    <div class="mode-card" id="btnAI">
+      <div class="icon">🤖⚔️🤖</div>
+      <div class="label">AI vs AI</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("btnHuman").onclick = () => {
+    window.location.href = "ai-human.html";
+  };
+
+  document.getElementById("btnAI").onclick = () => {
+    window.location.href = "ai-ai.html";
+  };
+</script>
+</body>
+</html>

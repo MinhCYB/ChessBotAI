@@ -76,3 +76,19 @@ class Inference:
         model_path = os.path.join(config.CANDIDATE_DIR, f"{model_name}.pth")
         self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
+
+if __name__ == "__main__": 
+    fens = {
+        "Sicilian (Najdorf)": "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+        "Sicilian Defense": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+        "Scandinavian Defense": "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", 
+        "Alekhine’s Defense": "rnbqkb1r/pppppppp/8/8/4P3/5n2/PPPP1PPP/RNBQKBNR w KQkq - 1 2",
+        "Bishop’s Opening": "rnbqkbnr/pppp1ppp/8/4p3/2B5/8/PPPPPPPP/RNBQK1NR b KQkq - 2 2",
+        "Ruy Lopez (Spanish Opening)": "rnbqkbnr/pppp1ppp/8/4p3/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2" 
+    }
+    for name, fen in fens.items():
+        board = chess.Board(fen)
+        bot = Inference("sl_lichess_model_v2", 1, False)
+
+        move, value = bot.get_action(board)
+        print(f"|{name}| `{fen}` | `{value:.2f}`|")

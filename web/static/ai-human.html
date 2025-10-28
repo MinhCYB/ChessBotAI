@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>🤖 Chơi cờ với Bot AI (Tùy FEN) — Với Đồng hồ & Bắt quân</title>
+  <link rel="stylesheet" href="ai-human.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="chessboard-1.0.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+
+
+<body>
+  
+  <!-- THEME SELECTOR: Preview 8x8 with pieces (start position) -->
+  <div id="theme-selector" aria-label="Chọn theme bàn cờ">
+    <h3>Pick Your Board Vibe!</h3>
+    <div id="theme-preview-list" role="list"></div>
+  </div>
+
+  <h2></h2>
+
+  <div id="controls">
+    <div id='fenBox'>
+      <input type="text" id="fenInput" placeholder="FEN" />
+    </div>
+    <br>
+    <button id="playWhiteBtn">Play as White</button>
+    <button id="playBlackBtn">Play as Black</button>
+    <button id="changeThemeBtn" style="display:none;">Đổi theme</button>
+  </div>
+
+  <!-- Player trên (Bot) -->
+  <div class="player-info top-player" id="player-top">
+    <div class="player-name"> &gt; DLchess</div>
+    <div class="player-captures" id="black-captures"> </div>
+    <div class="player-timer" id="black-timer">10:00</div>
+  </div>
+
+  <div id="board" style="width: 600px"></div>
+
+  <!-- Player dưới (Bạn) -->
+  <div class="player-info bottom-player" id="player-bottom">
+    <div class="player-name"> &gt; Human</div>
+    <div class="player-captures" id="white-captures"> </div>
+    <div class="player-timer" id="white-timer">10:00</div>
+  </div>
+
+  <div id="replay-controls" style="text-align:center; margin-top:12px;">
+    <button id="firstBtn" title="Về đầu"><img src="img/rn/double-left.png" alt="first"></button>
+    <button id="prevBtn" title="Lùi"><img src="img/rn/left.png" alt="prev"></button>
+    <button id="pauseBtn" title="Dừng / Tiếp"><img src="img/rn/play-pause.png" alt="play/pause"></button>
+    <button id="nextBtn" title="Tiến"><img src="img/rn/right.png" alt="next"></button>
+    <button id="lastBtn" title="Tới cuối"><img src="img/rn/double-right.png" alt="last"></button>
+  </div>
+
+
+  <div id="bottom-controls">
+    <button id="newGameBtn">New Game</button>
+    <button id="exportGameBtn">Export Game</button>
+    <div id="fenBox">
+      <label for="fenOutput"><strong>FEN:</strong></label>
+      <input type="text" id="fenOutput" readonly />
+    </div>
+  </div>
+
+  <!-- Popup chọn quân phong cấp -->
+  <div id="promotion-dialog" style="display:none;">
+    <div class="promotion-content">
+      <h4>Chọn quân để phong cấp</h4>
+      <div class="promotion-options">
+        <img src="img/chesspieces/wikipedia/wQ.png" data-piece="q" alt="Hậu">
+        <img src="img/chesspieces/wikipedia/wR.png" data-piece="r" alt="Xe">
+        <img src="img/chesspieces/wikipedia/wN.png" data-piece="n" alt="Mã">
+        <img src="img/chesspieces/wikipedia/wB.png" data-piece="b" alt="Tượng">
+      </div>
+    </div>
+  </div>
+
+
+  <script src="ai-human.js"></script>
+
+</body>
+</html>

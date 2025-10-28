@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import os
+import argparse
+import sys
 from tqdm import tqdm
 from torch.utils.data import DataLoader, random_split, ConcatDataset
 from torch.utils.tensorboard import SummaryWriter
@@ -11,6 +13,13 @@ from src.preprocessing.dataset import ChessSLDataset
 import config.config as config
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str, default=None)
+    parser.add_argument('--output', type=str, default="sl_model")
+    args = parser.parse_args()
+    output_model = args.output
+    input_model = args.input
+
     print("--- Bắt đầu Giai đoạn 1: Huấn luyện có giám sát ---")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -63,12 +72,12 @@ if __name__ == "__main__":
     ).to(device)
 
     try: 
-        model_path = os.path.join(config.CANDIDATE_DIR, f"sl_lichess_model.pth")
+        model_path = os.path.join(config.SL_MODEL_DIR, f"{input_model}.pth")
         if os.path.exists(model_path):
             print(f"Load model in {model_path}")
             model.load_state_dict(torch.load(model_path))
     except Exception as e: 
-        print(f"Lỗi khi load lại model")
+        print(f"Lỗi khi load lại model: {e}")
         
     policy_criterion = nn.NLLLoss().to(device) 
     value_criterion = nn.MSELoss().to(device)
@@ -157,7 +166,7 @@ if __name__ == "__main__":
 
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
-            path_model = os.path.join(config.SL_MODEL_DIR, f'sl_model.pth')
+            path_model = os.path.join(config.SL_MODEL_DIR, f'{output_model}.pth')
             torch.save(model.state_dict(), path_model)
             print(f"-> Đã lưu model mới tại {path_model} (Val Loss: {avg_val_loss:.4f})")
 

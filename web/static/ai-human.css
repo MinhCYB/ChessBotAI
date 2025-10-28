@@ -1,0 +1,429 @@
+/*! chessboard.js v1.0.0 | (c) 2019 Chris Oakman | MIT License chessboardjs.com/license */
+
+.clearfix-7da63 {
+  clear: both;
+}
+
+/* Toàn bộ bàn cờ */
+/* .board-b72b1 {
+  border: 4px solid #004d40;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: content-box;
+} */
+
+/* Mỗi ô cờ */
+.square-55d63 {
+  float: left;
+  position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+/* 
+.white-1e1d7 {
+  background-color: #e0f2f1; 
+  color: #004d40;
+}
+
+.black-3c85d {
+  background-color: #00695c; 
+  color: #e0f2f1;
+}  */
+
+/* ====== THEMES ====== */
+
+.theme-wood .white-1e1d7 { background-color: #f0d9b5; color: #b58863; }
+.theme-wood .black-3c85d { background-color: #b58863; color: #f0d9b5; }
+.theme-wood .board-b72b1 {
+  border: 4px solid #404040;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: content-box;
+}
+
+.theme-green .white-1e1d7 { background-color: #e0f2f1; color: #004d40; }
+.theme-green .black-3c85d { background-color: #00695c; color: #e0f2f1; }
+.theme-green .board-b72b1 {
+  border: 4px solid #004d40;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: content-box;
+}
+
+.theme-pink .white-1e1d7 { background-color: #ffe6f1; color: #b3005e; }
+.theme-pink .black-3c85d { background-color: #ff99cc; color: #4a0033; }
+.theme-pink .board-b72b1 {
+  border: 4px solid #f35192;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: content-box;
+}
+
+.theme-blue .white-1e1d7 { background-color: #d0e7ff; color: #004080; }
+.theme-blue .black-3c85d { background-color: #0066cc; color: #cce5ff; }
+.theme-blue .board-b72b1 {
+  border: 4px solid #111d8a;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: content-box;
+}
+
+/* Highlight khi chọn/kéo quân */
+.highlight1-32417,
+.highlight2-9c5d2 {
+  box-shadow: inset 0 0 6px 4px rgba(255, 215, 0, 0.8);
+  transition: box-shadow 0.15s ease;
+}
+
+/* Ký hiệu hàng cột (a-h, 1-8) */
+.notation-322f9 {
+  cursor: default;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  position: absolute;
+  color: #222;
+}
+
+.alpha-d2270 {
+  bottom: 1px;
+  right: 3px;
+}
+
+.numeric-fc462 {
+  top: 2px;
+  left: 2px;
+}
+
+.square-55d63:hover {
+  box-shadow: inset 0 0 6px 3px rgba(255, 215, 0, 0.8);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+
+html, body {
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: #222;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#board {
+  width: 400px;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+#controls, #bottom-controls {
+  text-align: center;
+  margin-top: 10px;
+}
+#controls button,
+#bottom-controls button {
+  background-color: #1e1e1e;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 3px;
+}
+#controls button:hover,
+#bottom-controls button:hover {
+  background-color: #333;
+}
+
+#fenBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: monospace;
+  margin-left: 10px;
+  text-align: center;
+}
+
+#fenBox label {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+#fenInput, 
+#fenOutput {
+  height: 30px;
+  width: 350px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: monospace;
+  color: #111;
+  padding: 0 10px; 
+  text-align: left;
+  line-height: 100px;  
+  box-sizing: border-box;
+}
+
+#fenInput::placeholder {
+  line-height: 36px; /* đảm bảo placeholder cũng giữa dọc */
+}
+
+input[type="text"] {
+  width: 70%;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+button {
+  padding: 6px 12px;
+  margin: 0 5px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Ẩn controls và board cho đến khi chọn theme */
+#controls, #bottom-controls, #board, h2 {
+  display: none;
+}
+
+#theme-selector{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%;
+  max-width: 1280px;
+  background: #ffffff;
+  padding: 40px 36px;
+  border-radius: 20px;
+  box-shadow: 0 18px 80px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  z-index: 1000;
+  max-height: 90vh; 
+  overflow-y: auto;     
+  overscroll-behavior: contain; 
+}
+
+#theme-selector h3 {
+  margin: 6px 0 30px;
+  font-size: clamp(50px, 5vw, 60px);
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+#theme-preview-list {
+  display:flex;
+  gap:28px;
+  justify-content:center;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  padding: 8px 6px;
+}
+
+/* Thẻ theme to hơn */
+.theme-card {
+  width: 260px;
+  border-radius:16px;
+  padding:14px;
+  background:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  cursor:pointer;
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s;
+  border:3px solid transparent;
+  user-select:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.theme-card:hover, .theme-card:focus {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow:0 22px 60px rgba(0,0,0,0.14);
+  outline: none;
+}
+.theme-card.selected {
+  border-color:#ffcc00;
+  box-shadow:0 20px 60px rgba(255,204,0,0.18);
+}
+
+/* Bàn cờ mini to hơn */
+.mini-board {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+  background: transparent;
+  padding: 6px; /* thêm một chút khoảng cách */
+}
+.mini-square { width:100%; height:100%; box-sizing:border-box; position:relative; }
+
+/* piece image size inside mini previews - to hơn */
+.mini-square img {
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* avoid interactions */
+  user-select: none;
+}
+
+.theme-title { margin-top:12px; font-size:18px; font-weight:800; color:#222; text-align:center; }
+
+/* Responsive: khi màn hình nhỏ, giảm kích thước card nhưng vẫn lớn hơn mặc định */
+@media (max-width:1100px) {
+  .theme-card { width: 44%; max-width: 360px; }
+  #theme-selector { padding: 28px 20px; }
+  #theme-selector h3 { font-size: 20px; }
+}
+
+@media (max-width:640px){
+  .theme-card { width:46%; }
+  #board { width:320px; }
+  .mini-square img { width: 86%; height:86%; }
+  #theme-selector { width: 96%; padding: 18px; border-radius: 12px; }
+}
+
+.player-info {
+  width: 600px;
+  margin: 6px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-family: "Poppins", "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  transition: box-shadow 0.3s ease;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #222;
+}
+
+.player-captures {
+  font-size: 18px;
+  color: #444;
+  letter-spacing: 2px;
+}
+
+.player-timer {
+  background: #111;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 52px;
+  text-align: center;
+}
+
+.top-player {
+  margin-bottom: 5px;
+  display: none;
+}
+.bottom-player {
+  margin-top: 5px;
+  display: none;
+}
+
+/* Khi tới lượt ai, có thể thêm hiệu ứng viền sáng */
+.active-turn {
+  box-shadow: 0 0 15px 3px gold;
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease;
+}
+
+#promotion-dialog {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.promotion-content {
+  background: white;
+  border-radius: 10px;
+  padding: 20px 30px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.promotion-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.promotion-options img {
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.15s ease;
+}
+
+.promotion-options img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px gold;
+}
+
+#replay-controls {
+  display: none;
+}
+
+#replay-controls button {
+  background: #fff;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  margin: 4px;
+  padding: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+#replay-controls button:hover {
+  background: #eee;
+  transform: scale(1.05);
+}
+
+#replay-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#replay-controls img {
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
