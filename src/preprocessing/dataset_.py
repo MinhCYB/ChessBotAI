@@ -52,7 +52,6 @@ class ChessSLDataset(Dataset):
                         raise Exception("Không thể mmap (lỗi từ helper)")
                     
                     file_length = len(X_mmap)
-                    # del X_mmap # Đóng file mmap tạm thời
                     
                     if file_length > 0:
                         self.file_base_paths.append(base_path)

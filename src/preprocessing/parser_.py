@@ -190,7 +190,7 @@ if __name__ == "__main__":
     """Chuẩn hóa dữ liệu đã sàng lọc"""
     print("Bắt đầu chuẩn hóa..")
 
-    # total_positions = count_total_positions()
-    parse_and_write_to_shards(47432963)
+    total_positions = count_total_positions()
+    parse_and_write_to_shards(total_positions)
 
     print("--- Xử lý hoàn tất! ---")

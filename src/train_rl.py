@@ -10,13 +10,12 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-# Import các file của project
 from src.rl.replay_buffer import ReplayBuffer 
 from src.rl.self_play import run_self_play_game
-from src.rl.mcts import MCTS # <-- Cần MCTS để thi đấu
+from src.rl.mcts import MCTS
 import config.config as config
 from src.model.architecture import ChessCNN
-from src.utils.utils import * # <-- Cần utils để chơi cờ
+from src.utils.utils import * 
 
 def evaluate_models(best_model: nn.Module, 
                     candidate_model: nn.Module, 
@@ -42,17 +41,14 @@ def evaluate_models(best_model: nn.Module,
         for _ in range(config.HISTORY_LENGTH):
             history.append(initial_planes)
             
-        # Lượt 1: Candidate cầm Trắng, Best cầm Đen
         if i % 2 == 0:
             players = {chess.WHITE: mcts_candidate, chess.BLACK: mcts_best}
             player_name = {chess.WHITE: "Candidate", chess.BLACK: "Best"}
-        # Lượt 2: Đảo màu
         else:
             players = {chess.WHITE: mcts_best, chess.BLACK: mcts_candidate}
             player_name = {chess.WHITE: "Best", chess.BLACK: "Candidate"}
 
         while not board.is_game_over():
-            # Lấy MCTS của người chơi hiện tại
             current_player_mcts = players[board.turn]
             
             # Lấy nước đi (T=0, tham lam)
@@ -61,7 +57,6 @@ def evaluate_models(best_model: nn.Module,
             board.push(move)
             history.append(board_to_numpy(board))
 
-        # Hết ván, kiểm tra kết quả
         result = board.result()
         if result == "1-0": # Trắng thắng
             if player_name[chess.WHITE] == "Candidate":
@@ -82,19 +77,17 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Sử dụng thiết bị: {device}")
     
-    # Khởi tạo TensorBoard
-    writer = SummaryWriter(log_dir="logs/rl_training")
+    writer = SummaryWriter(log_dir="log/rl_training")
 
-    # --- SỬA LỖI MODEL LOADING ---
     best_model = ChessCNN(
         num_planes=config.TOTAL_PLANES
     ).to(device)
     
-    # 1. Thử load model RL "tốt nhất" (nếu có)
+    # Tải model có sẵn nếu có
     try:
-        best_model.load_state_dict(torch.load(config.RL_BEST_MODEL_PATH))
-        print(f"Đã tải model RL tốt nhất từ: {config.RL_BEST_MODEL_PATH}")
-    # 2. Nếu không, load model SL (Giai đoạn 1)
+        model_path = os.path.join(config.CANDIDATE_DIR, "sl_lichess_model_v2.pth")
+        best_model.load_state_dict(torch.load(model_path))
+        print(f"Đã tải model RL tốt nhất từ: {model_path}")
     except FileNotFoundError:
         print(f"Không tìm thấy model RL. Tải model SL (base) từ: {config.RL_MODEL_DIR}")
         best_model.load_state_dict(torch.load(config.RL_BEST_MODEL_PATH))
@@ -103,27 +96,22 @@ if __name__ == "__main__":
         
     best_model.eval()
     
-    # Tạo model ứng cử viên (candidate) - CHỈ ĐỂ GIỮ CHỖ
-    # Model thật sẽ được tạo TRONG VÒNG LẶP
     candidate_model = ChessCNN(
         num_planes=config.TOTAL_PLANES
     ).to(device)
     
     replay_buffer = ReplayBuffer(config.RL_BUFFER_SIZE_SAMPLES)
     
-    # Lấy model weights (state_dict) ra khỏi GPU, đưa về CPU
     model_weights_cpu = {k: v.cpu() for k, v in best_model.state_dict().items()}
 
-    # --- BẮT ĐẦU CHẠY SONG SONG ---
     mp.set_start_method('spawn', force=True) 
     
     with mp.Pool(config.RL_NUM_WORKERS) as pool:
         for i in range(config.RL_TOTAL_ITERATIONS):
             print(f"\n--- [Vòng lặp RL {i+1}/{config.RL_TOTAL_ITERATIONS}] ---")
             
-            # --- Giai đoạn 1: SELF-PLAY (Code của bro đã chuẩn) ---
             print(f"Giai đoạn 1: Đang chạy {config.RL_NUM_GAMES_PER_ITER} ván self-play...")
-            best_model.eval() # Đảm bảo model "best" ở chế độ eval
+            best_model.eval() 
             
             task_func = partial(
                 run_self_play_game,
@@ -137,7 +125,6 @@ if __name__ == "__main__":
             ]
             
             total_new_samples = 0
-            # Thêm TQDM để xem tiến độ thu hoạch
             for res in tqdm(results, desc="Thu hoạch ván cờ", leave=False):
                 game_data = res.get()
                 if game_data:
@@ -149,11 +136,10 @@ if __name__ == "__main__":
             writer.add_scalar('SelfPlay/new_samples', total_new_samples, i)
             writer.add_scalar('SelfPlay/buffer_size', len(replay_buffer), i)
 
-            if len(replay_buffer) < config.RL_TRAIN_BATCH_SIZE * 10: # (Ít nhất 10 batch)
+            if len(replay_buffer) < config.RL_TRAIN_BATCH_SIZE * 10:
                 print("Buffer quá nhỏ, tiếp tục self-play...")
                 continue
 
-            # --- Giai đoạn 2: TRAINING (Hoàn thiện) ---
             print("Giai đoạn 2: Đang huấn luyện (finetune) model mới...")
             
             # Tải data "lười" từ buffer
@@ -167,20 +153,15 @@ if __name__ == "__main__":
             
             # Tạo model "ứng cử viên" MỚI và copy weights
             candidate_model.load_state_dict(best_model.state_dict())
-            candidate_model.train() # <-- Chuyển sang chế độ train
+            candidate_model.train()
             
-            # --- SỬA LỖI LOSS VÀ OPTIMIZER ---
-            # 1. Dùng KLDivLoss cho Policy (vector vs vector)
             policy_criterion = nn.KLDivLoss(reduction='batchmean').to(device)
-            # 2. Value loss giữ nguyên
             value_criterion = nn.MSELoss().to(device)
-            # 3. Optimizer phải train trên 'candidate_model'
             optimizer = optim.Adam(
                 candidate_model.parameters(), 
-                lr=config.RL_TRAIN_LR # Dùng LR của RL
+                lr=config.RL_TRAIN_LR 
             )
             scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
-            # --- HẾT SỬA LỖI ---
             
             running_loss = 0.0
             running_p_loss = 0.0
@@ -213,7 +194,6 @@ if __name__ == "__main__":
             writer.add_scalar('Train/policy_loss', running_p_loss / len(train_loader), i)
             writer.add_scalar('Train/value_loss', running_v_loss / len(train_loader), i)
 
-            # --- Giai đoạn 3: EVALUATION (Hoàn thiện) ---
             print("Giai đoạn 3: Đang thi đấu (Evaluate)...")
             best_model.eval()
             candidate_model.eval()
@@ -221,17 +201,15 @@ if __name__ == "__main__":
             win_rate = evaluate_models(best_model, candidate_model, device)
             writer.add_scalar('Evaluate/candidate_win_rate', win_rate, i)
             
-            # CẬP NHẬT MODEL MỚI NHẤT CHO WORKERS (Quan trọng!)
             if win_rate > config.RL_EVAL_WIN_THRESHOLD:
-                print(f">>> Candidate THẮNG ({win_rate:.2f})! Nâng cấp 'best_model'.")
+                print(f">>> Candidate THẮNG ({win_rate:.2f})! Nâng cấp")
                 best_model.load_state_dict(candidate_model.state_dict())
                 torch.save(best_model.state_dict(), config.RL_BEST_MODEL_PATH)
                 
-                # Cập nhật weights mới cho vòng self-play tiếp theo
+                # Cập nhật weights mới 
                 model_weights_cpu = {k: v.cpu() for k, v in best_model.state_dict().items()}
             else:
-                print(f">>> Candidate THUA ({win_rate:.2f}). Giữ lại model cũ.")
-                # Không làm gì cả, vòng lặp sau sẽ dùng model_weights_cpu cũ
+                print(f">>> Candidate THUA ({win_rate:.2f})")
 
     print("--- Vòng lặp RL hoàn tất ---")
     writer.close()

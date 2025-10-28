@@ -6,17 +6,22 @@ import src.utils.utils as utils
 import config.config as config
 from collections import deque
 from src.model.architecture import ChessCNN 
+from src.rl.mcts import MCTS
 import logging 
 
 logger = logging.getLogger(__name__)
 
 
 class Inference: 
-    def __init__(self, model_name='sl_model', history_length=1):
+    def __init__(self, model_name='', history_length=1, use_mcts=False):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = ChessCNN(num_planes=8+history_length*12).to(self.device)
         self.load(model_name)
         self.cnt_win = 0
+
+        self.use_mcts = use_mcts
+        if use_mcts:
+            self.mcts_searcher = MCTS(self.model, self.device)
 
         self.model_name = model_name
         self.history = deque(maxlen=history_length)
@@ -34,6 +39,9 @@ class Inference:
         
         self.history.append(utils.board_to_numpy(board))
 
+        if self.use_mcts: 
+            return self.mcts_searcher.search(board, self.history, 0)
+        
         history_stack = np.concatenate(list(self.history), axis=0)               # (N*12, 8, 8)
         meta_planes = utils.get_meta_planes_numpy(board)                         # (8, 8, 8)
         state = np.concatenate([history_stack, meta_planes], axis=0)             # (N*12 + 8, 8, 8)

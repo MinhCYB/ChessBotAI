@@ -103,7 +103,7 @@ def run_self_play_game(worker_id: int, iter_num: int, model_weights: dict):
                 (state, policy, current_value)
             )
         
-        print(f"[Worker {worker_id}] Vòng {iter_num}: Chơi xong {move_count} nước. Kết quả: {result}")
+        # print(f"[Worker {worker_id}] Vòng {iter_num}: Chơi xong {move_count} nước. Kết quả: {result}")
         return final_game_data
         
     except Exception as e:
