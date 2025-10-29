@@ -345,10 +345,11 @@ MinhCYB - `minhdangquang242006@gmail.com`
 
 Diệu Linh - `ldieu.v2@gmail.com`
 
-Phương Chi - ``
+Phương Chi - `lehongphuongchi111@gmail.com`
 
 
 Link dự án: [https://github.com/MinhCYB/ChessBotAI](https://github.com/MinhCYB/ChessBotAI)
+
 
 
 
