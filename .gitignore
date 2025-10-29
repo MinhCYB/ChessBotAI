@@ -40,6 +40,7 @@ models/rl_candidate_model/*
 !models/sl_base_model/.gitkeep
 !models/rl_best_model/.gitkeep
 !models/rl_candidate_model/.gitkeep
+!models/rl_candidate_model/sl_lichess_model_v2.pth
 
 # Tệp log và kết quả
 *.log
