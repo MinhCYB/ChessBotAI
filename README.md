@@ -22,8 +22,6 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
 ---
 ## 🛠️ Công nghệ Chính 
 
-Project này không chỉ là một script đơn lẻ mà là một pipeline hoàn chỉnh, kết hợp nhiều công nghệ:
-
 ### 1. 🧠 Lõi AI & Deep Learning (Core AI & Deep Learning)
 
 * **[PyTorch](https://pytorch.org/)**: Framework Deep Learning chính được sử dụng để xây dựng, huấn luyện (train), và thực thi (inference) mô hình `ChessCNN`.
