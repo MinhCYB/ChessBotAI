@@ -20,9 +20,10 @@ env/
 
 # Bỏ qua tất cả dữ liệu (thô và đã xử lý)\
 data/crawler/
-data/split/
+data/split/*
 data/raw_pgn/*
 data/processed/*
+!data/split/.gitkeep
 !data/processed/.gitkeep
 !data/raw_pgn/.gitkeep
 
