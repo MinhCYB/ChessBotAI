@@ -11,6 +11,13 @@ Chào mừng đến với `ChessBotAI`! Đây là repository dành cho việc hu
 
 Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **Học có Giám sát (Supervised Learning)** để học hỏi từ các ván cờ của con người, sau đó sử dụng **Học Tăng cường (Reinforcement Learning)** thông qua cơ chế tự chơi (self-play) để tinh chỉnh và vượt qua giới hạn của con người.
 
+## 📍 Mục Lục
+
+* [Công nghệ Chính](#️-công-nghệ-chính-technology-stack)
+* [Chơi với Bot (Giao diện Web)](#-chơi-với-bot-giao-diện-web)
+* [Giải thích Thuật toán](#-giải-thích-thuật-toán)
+* [Kết quả](#-kết-quả)
+  
 ---
 ## 🛠️ Công nghệ Chính (Technology Stack)
 
@@ -338,3 +345,4 @@ Phương Chi - ``
 
 
 Link dự án: [https://github.com/MinhCYB/ChessBotAI](https://github.com/MinhCYB/ChessBotAI)
+
