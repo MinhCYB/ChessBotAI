@@ -45,7 +45,7 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
     * **Chunk Shuffling:** Thay vì shuffle 100GB dữ liệu trong RAM (bất khả thi), `Dataset` sẽ **xáo trộn danh sách các file băm** (`random.shuffle(base_names)`) và **chia danh sách file băm** (80% file cho `train`, 20% cho `val`) ngay từ đầu.
 * **[ReplayBuffer](...)**: Một cấu trúc dữ liệu (`list`) hoạt động như "bộ nhớ" của AI, lưu trữ hàng triệu nước đi từ các ván self-play gần đây. Lý do chọn `list` là để tăng tốc độ truy xuất ngẫu nhiên.
 
-### 4. 🌐 Ứng dụng & Giám sát (App & Monitoring)
+### 4. Ứng dụng & Giám sát (App & Monitoring)
 
 * **[Flask](https://flask.palletsprojects.com/en/3.0.x/)**: Một web framework siêu nhẹ, được dùng để tạo ra giao diện web đơn giản cho phép bạn (và người khác) chơi cờ trực tiếp với model đã huấn luyện.
 * **[TensorBoard](https://www.tensorflow.org/tensorboard)**: Được tích hợp (`SummaryWriter`) để theo dõi (monitoring) các chỉ số (loss, win rate, elo) trong quá trình training. Giúp trực quan hóa xem model có đang mạnh lên hay không.
@@ -96,7 +96,7 @@ Phần này hướng dẫn bạn cách khởi chạy một web server Flask đơ
 
 ---
 
-## 🔬 Thuật toán
+## Thuật toán
 
 Quy trình huấn luyện của `ChessBotAI` được chia làm hai giai đoạn chính, lấy cảm hứng từ phương pháp của AlphaZero.
 
@@ -349,5 +349,6 @@ Phương Chi - ``
 
 
 Link dự án: [https://github.com/MinhCYB/ChessBotAI](https://github.com/MinhCYB/ChessBotAI)
+
 
 
