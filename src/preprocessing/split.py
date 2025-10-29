@@ -14,10 +14,10 @@ import pandas as pd
 import config.config as config
 from src.utils.utils import *
 
-def parser(source):
-    data_dir = os.path.join(config.RAW_PGN_DIR, source)
-    save_dir = os.path.join(config.SPLIT_DIR, source)
-    csv_path = os.path.join(save_dir, f"{source}_info.csv")
+def split():
+    data_dir = config.RAW_PGN_DIR
+    save_dir = config.SPLIT_DIR
+    csv_path = os.path.join(save_dir, f"info.csv")
     print(f"Bắt đầu quét thư mục: {data_dir}")
     
     os.makedirs(save_dir, exist_ok=True)
@@ -28,14 +28,14 @@ def parser(source):
     pgn_files = [f for f in os.listdir(data_dir) if f.endswith('.pgn')]
     for file_name in tqdm(pgn_files, desc="Đang đọc file PGN", unit="file"):
         file_path = os.path.join(data_dir, file_name)
-        save_dir = os.path.join(config.SPLIT_DIR, source)
+        save_dir = config.SPLIT_DIR
         args = [
             r"venv\Scripts\python.exe", "-m", "src.preprocessing.pgn_split",
             "--filename", file_name, 
             "--filepath", file_path,
             "--csvpath", csv_path,
             "--savedir", save_dir,
-            "--minelo", ("0" if source == "master" else "2500"),
+            "--minelo", "2500",
             "--minply", "40"
         ] 
         subprocess.run(args)
@@ -49,6 +49,5 @@ def parser(source):
 
 if __name__ == "__main__":
     """ Tách và tiền xử lý toàn bộ dữ liệu raw"""
-    for source in config.SOURCES:
-        parser(source)
+    split()
     print("--- Xử lý hoàn tất! ---")

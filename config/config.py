@@ -45,10 +45,6 @@ RL_BEST_MODEL_PATH = RL_MODEL_DIR / "best_model.pth"
 CANDIDATE_DIR = MODEL_DIR / "rl_candidate_model"
 LOG_PATH = BASE_DIR / "log/debug.log"
 PGN_PATH = BASE_DIR / "pgn/battle.pgn"
-# SOURCES = ["twic", "master", "tcec", "lichess", "ccrl"]
-# SOURCES = ["tcec", "lichess", "ccrl", "master", "twic"]
-# SOURCES = ["lichess_2024", "lichess_2025"]  
-SOURCES = ["ccrl"]
 
 # --- define log ---
 logging.basicConfig(

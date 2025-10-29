@@ -1,10 +1,10 @@
 import chess
+import chess.pgn
 import os
 from tqdm import tqdm 
 import argparse
 import csv
 import gc
-
 from config.config import *
 from src.utils.utils import *
 

@@ -233,11 +233,11 @@ Giai đoạn này chuyển đổi các file `.pgn` (dữ liệu thô của con n
 2.  Chạy script tiền xử lý:
 
     ```bash
-    # Tách hàng triệu ván cờ từ dữ liệu thô thành những file nhỏ hơn (5000 trận) lưu vào "data/split"
+    # Lọc và tách hàng triệu ván cờ từ dữ liệu thô thành những file nhỏ hơn (5000 trận) lưu vào "data/split"
     python -m src.preprocessing.split  
     
     # Đọc dữ liệu từ "data/split" chuyển các file .pgn trong "data/split" thành .npy 
-    python -m src.preprocessing.parser 
+    python -m src.preprocessing.parser --numshards=100 # số lượng chunk data muốn chia
     ```
     Script này sẽ đọc PGN, chuyển đổi mỗi thế cờ thành một vector, gán nhãn (thắng/thua/hòa) và lưu thành các file `.npy` trong `data/processed/`.
 
@@ -316,18 +316,23 @@ Model đánh giá một số thế cờ khai cuộc phổ biến:
 ├── config/                 # Chứa file cấu hình siêu tham số
 ├── data/                   # Chứa dữ liệu
 │   ├── processed/          # Dữ liệu .npy đã xử lý cho training (SL)
-│   |── split/              # Dữ liệu .pgn thô sau khi chia nhỏ
-|   └── raw_pgn/            # Dữ liệu .pgn thô 
+│   │── split/              # Dữ liệu .pgn thô sau khi chia nhỏ
+│   └── raw_pgn/            # Dữ liệu .pgn thô 
 ├── models/                 # Nơi lưu các file model
 │   ├── rl_best_model/      # Lưu model tốt nhất
-│   |── rl_candidate_model/ # Lưu ứng cử viên 
-|   └── sl_base_model/      # Lưu các model học giám sát
+│   │── rl_candidate_model/ # Lưu ứng cử viên 
+│   └── sl_base_model/      # Lưu các model học giám sát
 ├── src/                    # Mã nguồn chính
-│   ├── model.py            # Định nghĩa kiến trúc model (Neural Network)
-│   ├── preprocess.py       # Script tiền xử lý dữ liệu PGN
+│   ├── model/              # Định nghĩa kiến trúc model (Neural Network)
+│   ├── preprocessing/      # Tiền xử lý dữ liệu PGN
+│   ├── utils/              # Các hàm hỗ trợ chung
+│   ├── rl/                 # Các script hỗ trợ training RL
 │   ├── train_sl.py         # Logic cho vòng lặp training SL
 │   ├── train_rl.py         # Logic cho vòng lặp training RL (self-play)
 │   └── ...
+├── web/                    # Cài đặt giao diện
+│   ├── static/             # html, css, ...
+│   └── server.py           
 ├── .gitignore              # File ignore của Git
 ├── main.py                 # Để test
 ├── requirements.txt        # Danh sách các thư viện Python
