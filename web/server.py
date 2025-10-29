@@ -47,7 +47,7 @@ CORS(app)
 #         return mod.predict(fen)
 #     raise ValueError(f"Bot '{bot_key}' không có hàm predict(fen).")
 
-def bot_predict(fen: str) -> str: 
+def bot_predict(_, fen: str) -> str: 
     """ Gọi predict của bot """
     move, _ = bot.get_action(chess.Board(fen))
     return move.uci()
@@ -185,5 +185,5 @@ def health():
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
     app.run(debug=True, threaded=True)
