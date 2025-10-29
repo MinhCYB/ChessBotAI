@@ -13,11 +13,11 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
 
 ## Mục Lục
 
-* [Công nghệ Chính](#️-công-nghệ-chính-technology-stack)
-* [Chơi với Bot (Giao diện Web)](#-chơi-với-bot-giao-diện-web)
-* [Thuật toán](#-thuật-toán)
-* [Hướng dẫn huấn luyện mô hình](#-hướng-dẫn-huấn-luyện-mô-hình)
-* [Kết quả](#-kết-quả)
+* [Công nghệ Chính](#công-nghệ-chính)
+* [Chơi với Bot (Giao diện Web)](#chơi-với-bot-giao-diện-web)
+* [Thuật toán](#thuật-toán)
+* [Hướng dẫn huấn luyện mô hình](#hướng-dẫn-huấn-luyện-mô-hình)
+* [Kết quả](#kết-quả)
   
 ---
 ## Công nghệ Chính 
