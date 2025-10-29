@@ -1,4 +1,4 @@
-﻿# ChessBotAI - Huấn luyện Model Cờ Vua ♟️🧠
+﻿# ChessBotAI - Huấn luyện Model Cờ Vua
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version">
@@ -11,7 +11,7 @@ Chào mừng đến với `ChessBotAI`! Đây là repository dành cho việc hu
 
 Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **Học có Giám sát (Supervised Learning)** để học hỏi từ các ván cờ của con người, sau đó sử dụng **Học Tăng cường (Reinforcement Learning)** thông qua cơ chế tự chơi (self-play) để tinh chỉnh và vượt qua giới hạn của con người.
 
-## 📍 Mục Lục
+## Mục Lục
 
 * [Công nghệ Chính](#️-công-nghệ-chính-technology-stack)
 * [Chơi với Bot (Giao diện Web)](#-chơi-với-bot-giao-diện-web)
@@ -20,14 +20,14 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
 * [Kết quả](#-kết-quả)
   
 ---
-## 🛠️ Công nghệ Chính 
+## Công nghệ Chính 
 
-### 1. 🧠 Lõi AI & Deep Learning (Core AI & Deep Learning)
+### 1. Lõi AI & Deep Learning (Core AI & Deep Learning)
 
 * **[PyTorch](https://pytorch.org/)**: Framework Deep Learning chính được sử dụng để xây dựng, huấn luyện (train), và thực thi (inference) mô hình `ChessCNN`.
 * **[MCTS (Monte Carlo Tree Search)](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search)**: Thuật toán "bộ não" chính trong Giai đoạn 2 (RL). Nó thực hiện hàng ngàn lượt "mô phỏng" (simulations) để tìm ra phân phối nước đi (policy) tối ưu, thay vì chỉ dựa vào "trực giác" của model.
 
-### 2. ♟️ Logic Cờ vua (Chess Logic)
+### 2. Logic Cờ vua (Chess Logic)
 
 * **[python-chess](https://python-chess.readthedocs.io/en/latest/)**: Thư viện cốt lõi để quản lý toàn bộ logic cờ vua. Nó xử lý mọi thứ:
     * Biểu diễn bàn cờ (Board state).
@@ -35,7 +35,7 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
     * Đọc và phân tích file PGN (dữ liệu Giai đoạn 1 - SL).
     * Xử lý FEN (định dạng bàn cờ).
 
-### 3. 🚀 Hiệu suất & Xử lý Dữ liệu (Performance & Data)
+### 3. Hiệu suất & Xử lý Dữ liệu (Performance & Data)
 
 * **[Multiprocessing](https://docs.python.org/3/library/multiprocessing.html)**: Cực kỳ quan trọng trong Giai đoạn 2 (RL). Nó cho phép chạy hàng ngàn ván cờ self-play *song song* (`mp.Pool`), tận dụng tối đa tất cả các nhân CPU để tạo dữ liệu nhanh chóng.
 * **[NumPy](https://numpy.org/)**: Dùng để biểu diễn bàn cờ dưới dạng ma trận (bitboards/planes) và là định dạng lưu trữ dữ liệu huấn luyện (`.npy`) hiệu quả.
@@ -53,7 +53,7 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
 
 ---
 
-## 🎮 Chơi với Bot (Giao diện Web)
+## Chơi với Bot (Giao diện Web)
 
 ![](https://github.com/MinhCYB/ChessBotAI/blob/main/mate/ui1.png)
 
@@ -141,7 +141,7 @@ Quy trình huấn luyện của `ChessBotAI` được chia làm hai giai đoạn
 
 ---
 
-## 📉 Chi tiết Hàm Mất Mát (Loss Function)
+## Chi tiết Hàm Mất Mát (Loss Function)
 
 Đây là phần cốt lõi của thuật toán. Gọi $f_\theta(s)$ là hàm model của chúng ta (với tham số $\theta$), $s$ là một thế cờ (state).
 Model trả về 2 giá trị: $f_\theta(s) = (\mathbf{p}, v)$
@@ -151,7 +151,7 @@ Model trả về 2 giá trị: $f_\theta(s) = (\mathbf{p}, v)$
 
 ---
 
-### 1. 🎓 Hàm Loss (SL)
+### 1. Hàm Loss (SL)
 
 * **Ground Truth (Sự thật):**
     * $z$: Kết quả cuối cùng của ván cờ ($z \in \{-1, 0, 1\}$).
@@ -166,7 +166,7 @@ Model trả về 2 giá trị: $f_\theta(s) = (\mathbf{p}, v)$
 
 ---
 
-### 2. 🧠 Hàm Loss (RL)
+### 2. Hàm Loss (RL)
 
 * **Ground Truth (Sự thật từ MCTS/Self-play):**
     * $z$: Kết quả cuối cùng của ván cờ *self-play* ($z \in \{-1, 0, 1\}$).
@@ -190,7 +190,7 @@ Model trả về 2 giá trị: $f_\theta(s) = (\mathbf{p}, v)$
 | **RL** | Bắt chước 1 phân phối | `KLDivLoss` (học 1 vector) | `MSELoss` (học $z$ từ self-play)|
 | | | $L_{policy} = -\sum \boldsymbol{\pi} \cdot \mathbf{p}$ | $L_{value} = (v - z)^2$ |
 
-## 🚀 Hướng dẫn huấn luyện mô hình
+## Hướng dẫn huấn luyện mô hình
 
 Dưới đây là các bước để huấn luyện model từ đầu.
 
@@ -278,7 +278,7 @@ Truy cập vào [http://localhost:6006/](http://localhost:6006/) để theo dõi
 
 ---
 
-## 📊 Kết quả
+## Kết quả
 
 
 ### 1. Quá trình Học có Giám sát (SL Training)
@@ -307,7 +307,7 @@ Model đánh giá một số thế cờ khai cuộc phổ biến:
 
 ---
 
-## 📁 Cấu trúc Thư mục
+## Cấu trúc Thư mục
 
 ```
 .
@@ -339,14 +339,15 @@ Model đánh giá một số thế cờ khai cuộc phổ biến:
 
 ---
 
-## 📞 Liên hệ
+## Liên hệ
 
 MinhCYB - `minhdangquang242006@gmail.com`
 
-Diệu Linh - ``
+Diệu Linh - `ldieu.v2@gmail.com`
 
 Phương Chi - ``
 
 
 Link dự án: [https://github.com/MinhCYB/ChessBotAI](https://github.com/MinhCYB/ChessBotAI)
+
 
