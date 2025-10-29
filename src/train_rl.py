@@ -53,7 +53,6 @@ def evaluate_models(best_model: nn.Module,
         while not board.is_game_over():
             current_player_mcts = players[board.turn]
             
-            # Lấy nước đi (T=0, tham lam)
             move, _ = current_player_mcts.search(board, history, temperature=0)
             
             board.push(move)

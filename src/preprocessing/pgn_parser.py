@@ -1,24 +1,14 @@
 import chess
-import chess.pgn
-import logging
 import numpy as np
 import os
 from tqdm import tqdm 
 from collections import deque
 import argparse
 import csv
-import gc
 
 from config.config import *
 from src.utils.utils import *
 
-logger = logging.getLogger(__name__)
-# --- Hằng số ---\
-
-# Kích thước đầu ra Policy
-POLICY_SIZE = 20480
-cnt_move = 0
-cnt_game = 0
 
 def parse_game(game: chess.pgn.Game, min_elo: int = 0, min_ply = 40):
     """ 

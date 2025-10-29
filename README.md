@@ -15,13 +15,14 @@ Dự án này sử dụng một phương pháp **hybrid (lai)**, kết hợp **H
 
 * [Công nghệ Chính](#️-công-nghệ-chính-technology-stack)
 * [Chơi với Bot (Giao diện Web)](#-chơi-với-bot-giao-diện-web)
-* [Giải thích Thuật toán](#-giải-thích-thuật-toán)
+* [Thuật toán](#-thuật-toán)
+* [Hướng dẫn huấn luyện mô hình](#-hướng-dẫn-huấn-luyện-mô-hình)
 * [Kết quả](#-kết-quả)
   
 ---
-## 🛠️ Công nghệ Chính (Technology Stack)
+## 🛠️ Công nghệ Chính 
 
-Project này không chỉ là một script đơn lẻ mà là một pipeline hoàn chỉnh, kết hợp nhiều công nghệ trong lĩnh vực AI:
+Project này không chỉ là một script đơn lẻ mà là một pipeline hoàn chỉnh, kết hợp nhiều công nghệ:
 
 ### 1. 🧠 Lõi AI & Deep Learning (Core AI & Deep Learning)
 
@@ -44,7 +45,7 @@ Project này không chỉ là một script đơn lẻ mà là một pipeline ho�
     * **Memory Mapping (mmap):** Dùng `np.load(..., mmap_mode='r')` để "ánh xạ" file trên ổ cứng vào bộ nhớ ảo. Nó chỉ tải **chính xác** byte dữ liệu (thế cờ) được yêu cầu vào RAM, giúp RAM sử dụng gần như bằng **0**.
     * **Lazy Indexing & Caching:** Khi khởi tạo, `Dataset` chỉ "quét" (scan) các *header* của file `.npy` để tạo "mục lục" (`cumulative_sizes`). Nó dùng `bisect` (tìm kiếm nhị phân) để tìm ra ngay lập tức một `idx` bất kỳ nằm ở file băm (chunk) nào.
     * **Chunk Shuffling:** Thay vì shuffle 100GB dữ liệu trong RAM (bất khả thi), `Dataset` sẽ **xáo trộn danh sách các file băm** (`random.shuffle(base_names)`) và **chia danh sách file băm** (80% file cho `train`, 20% cho `val`) ngay từ đầu.
-* **[ReplayBuffer](...)**: Một cấu trúc dữ liệu (`deque`) hoạt động như "bộ nhớ" của AI, lưu trữ hàng triệu nước đi từ các ván self-play gần đây.
+* **[ReplayBuffer](...)**: Một cấu trúc dữ liệu (`list`) hoạt động như "bộ nhớ" của AI, lưu trữ hàng triệu nước đi từ các ván self-play gần đây. Lý do chọn `list` là để tăng tốc độ truy xuất ngẫu nhiên.
 
 ### 4. 🌐 Ứng dụng & Giám sát (App & Monitoring)
 
@@ -97,7 +98,7 @@ Phần này hướng dẫn bạn cách khởi chạy một web server Flask đơ
 
 ---
 
-## 🔬 Giải thích Thuật toán
+## 🔬 Thuật toán
 
 Quy trình huấn luyện của `ChessBotAI` được chia làm hai giai đoạn chính, lấy cảm hứng từ phương pháp của AlphaZero.
 
@@ -191,7 +192,7 @@ Model trả về 2 giá trị: $f_\theta(s) = (\mathbf{p}, v)$
 | **RL** | Bắt chước 1 phân phối | `KLDivLoss` (học 1 vector) | `MSELoss` (học $z$ từ self-play)|
 | | | $L_{policy} = -\sum \boldsymbol{\pi} \cdot \mathbf{p}$ | $L_{value} = (v - z)^2$ |
 
-## 🚀 Hướng dẫn Sử dụng (Pipeline Huấn luyện)
+## 🚀 Hướng dẫn huấn luyện mô hình
 
 Dưới đây là các bước để huấn luyện model từ đầu.
 

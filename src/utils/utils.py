@@ -1,7 +1,7 @@
 import chess
 import numpy as np
 
-# --- 1. Tạo mapping action <-> index ---
+# --- Tạo mapping action <-> index ---
 PROMOS = [None, chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT]
 
 def generate_action_mapping():
@@ -22,7 +22,7 @@ def generate_action_mapping():
 ACTION_TO_IDX, IDX_TO_ACTION = generate_action_mapping()
 ACTION_SIZE = len(ACTION_TO_IDX)  # 64*64*5 = 20480
 
-# --- 2. Chuyển chess.Move <-> index using mapping ---
+# --- Chuyển chess.Move <-> index using mapping ---
 def move_to_index(move: chess.Move):
     return ACTION_TO_IDX[(move.from_square, move.to_square, move.promotion)]
 
@@ -33,7 +33,7 @@ def index_to_move(idx: int):
     except:
         return None
     
-# --- 3. board -> numpy (C,8,8)
+# --- board -> numpy (C,8,8)
 def board_to_numpy(board: chess.Board):
     """"
         Chuyển board sang numpy (12, 8, 8)

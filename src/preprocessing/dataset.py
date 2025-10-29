@@ -4,25 +4,22 @@ from torch.utils.data import Dataset
 import os
 import functools
 import bisect 
-import logging
-import random # <<< THÊM THƯ VIỆN NÀY
+import random 
 
-# (Hàm get_mmap_array giữ nguyên, không đổi)
+# Cache lại các file npy
 @functools.lru_cache(maxsize=16) 
 def get_mmap_array(file_path):
     try:
         return np.load(file_path, mmap_mode='r')
     except Exception as e:
-        logging.error(f"LỖI nghiêm trọng khi mmap file băm {file_path}: {e}")
+        print(f"Lỗi mmap file băm {file_path}: {e}")
         return None
 
 class ChessSLDataset(Dataset):
     """
-    Dataset "phá đảo I/O"
     Tự chia train/val và tự shuffle các file băm (chunk).
     """
     
-    # Thêm 3 tham số mới: mode, val_split, shuffle_chunks
     def __init__(self, processed_dir, mode='train', val_split=0.2, shuffle_chunks=True):
         self.processed_dir = processed_dir
         self.shards_info = []
@@ -30,19 +27,17 @@ class ChessSLDataset(Dataset):
         
         print(f"\nĐang lập chỉ mục cho mode: '{mode}'...")
         
-        # 1. Tìm tất cả các file băm
         try:
             base_names = sorted(
                 [f.replace(".X.npy", "") for f in os.listdir(processed_dir) if f.endswith(".X.npy")]
             )
         except FileNotFoundError:
-            print(f"!!! LỖI: Không tìm thấy thư mục 'data': {processed_dir}")
+            print(f"Không tìm thấy {processed_dir}")
             raise
         if not base_names:
-            print(f"!!! LỖI: Không tìm thấy file 'chunk_...X.npy' nào.")
+            print(f"Không có dữ liệu")
             raise
 
-        # --- 2. LOGIC MỚI: XÁO TRỘN VÀ CHIA FILE BĂM ---
         if shuffle_chunks:
             print(f"  -> Đang xáo trộn (shuffle) {len(base_names)} file băm...")
             random.shuffle(base_names)
@@ -56,11 +51,10 @@ class ChessSLDataset(Dataset):
         else: # mode == 'val'
             self.chunk_base_names = base_names[split_idx:]
             print(f"  -> Mode 'val': Lấy {len(self.chunk_base_names)}/{len(base_names)} file băm cuối cùng.")
-        # -----------------------------------------------
 
-        # 3. Quét header (Chỉ quét các file của mode này)
+        # Quét header (Chỉ quét các file của mode này)
         print("  -> Đang quét header của các file băm được chọn...")
-        for base_name in self.chunk_base_names: # <<< Chỉ lặp qua các file đã chia
+        for base_name in self.chunk_base_names:
             path_X = os.path.join(processed_dir, f"{base_name}.X.npy")
             
             mmap_temp = None
@@ -85,7 +79,6 @@ class ChessSLDataset(Dataset):
     def __len__(self):
         return self.total_length
 
-    # __getitem__ giữ nguyên, không cần sửa
     def __getitem__(self, idx):
         if idx < 0 or idx >= self.total_length:
             raise IndexError("Index out of range")

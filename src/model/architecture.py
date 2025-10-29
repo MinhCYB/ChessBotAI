@@ -17,7 +17,6 @@ class ChessCNN(nn.Module):
         
         self.num_planes = num_planes
         
-        # --- Feature extractor (Thân chung) ---
         self.conv1 = nn.Conv2d(num_planes, 128, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(128)
 
@@ -38,15 +37,13 @@ class ChessCNN(nn.Module):
         self.policy_bn = nn.BatchNorm2d(2)
         self.policy_fc = nn.Linear(2 * 8 * 8, action_size) # 2*8*8 = 128
 
-        # --- Value head (Đầu Value) --- (MỚI)
-        # Cấu trúc value head chuẩn của AlphaZero:
+        # --- Value head (Đầu Value) --- 
         self.value_conv = nn.Conv2d(256, 1, kernel_size=1) # 1. Conv 1x1 -> 1 channel
         self.value_bn = nn.BatchNorm2d(1)
         self.value_fc1 = nn.Linear(1 * 8 * 8, 256)        # 2. FC (1*8*8=64 -> 256)
         self.value_fc2 = nn.Linear(256, 1)                # 3. FC (256 -> 1) (ra kết quả)
 
     def forward(self, x):
-        # --- CNN tower (Thân chung) ---
         # x ban đầu: (batch_size, num_planes, 8, 8)
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
@@ -54,19 +51,16 @@ class ChessCNN(nn.Module):
         x = F.relu(self.bn4(self.conv4(x)))
         # x bây giờ là feature map chung: (batch_size, 256, 8, 8)
 
-        # --- Policy head (Nhánh 1) ---
+        # --- Policy head  ---
         p = F.relu(self.policy_bn(self.policy_conv(x)))
         p = p.view(-1, 2 * 8 * 8) # (batch_size, 128)
         p = self.policy_fc(p)
-        # (MỚI - KHUYÊN DÙNG)
-        # Bro nên có 1 activation ở cuối policy, ví dụ log_softmax
         p = F.log_softmax(p, dim=1) 
 
-        # --- Value head (Nhánh 2) --- (MỚI)
+        # --- Value head (Nhánh 2) --- 
         v = F.relu(self.value_bn(self.value_conv(x))) # (batch_size, 1, 8, 8)
-        v = v.view(-1, 1 * 8 * 8) # (batch_size, 64)
+        v = v.view(-1, 1 * 8 * 8)                     # (batch_size, 64)
         v = F.relu(self.value_fc1(v))                 # (batch_size, 256)
         v = torch.tanh(self.value_fc2(v))             # (batch_size, 1)
         
-        # Trả về cả 2 đầu
         return p, v
